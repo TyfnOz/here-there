@@ -1,7 +1,6 @@
 'use client';
 
-import { useFormState } from 'react-dom';
-import { useEffect } from 'react';
+import { useActionState, useEffect } from 'react';
 import { actionFunction } from '@/utils/types';
 import { toast } from 'sonner';
 
@@ -10,7 +9,7 @@ const initialState = {
 };
 
 function FormContainer({action, children} : {action:actionFunction, children:React.ReactNode}){
-    const [state, formAction] = useFormState(action, initialState);
+    const [state, formAction] = useActionState(action, initialState);
 
     useEffect(() => {
         if(state.message){
