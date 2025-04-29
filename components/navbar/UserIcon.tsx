@@ -1,6 +1,8 @@
+import {LuUser} from 'react-icons/lu';
+
 function UserIcon() {
   return (
-    <div>UserIcon</div>
+    <LuUser className='w-6 h-6 bg-primary rounded-full text-white'/>
   );
 }
 
