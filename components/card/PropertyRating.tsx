@@ -1,10 +1,11 @@
 import {FaStar} from 'react-icons/fa';
 
-function PropertyRating({ inPage}:{ inPage:boolean}) {
+function PropertyRating({propertyId, inPage}:{propertyId:string, inPage:boolean}) {
   //temp
   const rating = 4.7;
   const count = 100;
-
+  // to remove unused error for now
+  propertyId = propertyId;
   const className = `flex gap-1 items-center ${inPage ? 'text-md' : 'text-xs'}`;
   const countText = count > 1 ? 'reviews' : 'review';
   const countValue = `(${count}) ${inPage ? countText : ''}`;
@@ -17,4 +18,4 @@ function PropertyRating({ inPage}:{ inPage:boolean}) {
   )
 }
 
-export default PropertyRating
+export default PropertyRating;
