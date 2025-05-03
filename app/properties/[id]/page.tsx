@@ -10,9 +10,7 @@ import PropertyMapClient from "@/components/properties/PropertyMapClient";
 import ShareButton from "@/components/properties/ShareButton";
 import UserInfo from "@/components/properties/UserInfo";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { fetchPropertyDetails } from "@/utils/actions"
-import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 
 async function PropertyDetailsPage({params}:{params:{id:string}}) {
@@ -37,7 +35,7 @@ async function PropertyDetailsPage({params}:{params:{id:string}}) {
             <div className="lg:col-span-8">
                 <div className="flex gap-x-4 items-center">
                     <h1 className="text-xl font-bold">{property.name}</h1>
-                    <PropertyRating inPage propertyId={property.id}/>
+                    <PropertyRating inPage />
                 </div>
                 <PropertyDetails details={details} />
                 <UserInfo profile={{firstName, profileImage}}/>
