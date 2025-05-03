@@ -1,16 +1,12 @@
 import LoadingCards from '@/components/card/LoadingCards';
 import CategoriesList from '@/components/home/CategoriesList';
 import PropertiesContainer from '@/components/home/PropertiesContainer';
-import { Suspense } from 'react';
+import { Suspense, use } from 'react';
 
-type Props = {
-  searchParams: {
-    category?: string;
-    search?: string;
-  };
-};
+type SearchParams = Promise<{ category: string, search: string} >
 
-function Page({ searchParams }: Props) {
+function HomePage(props: { searchParams:SearchParams}) {
+  const searchParams = use(props.searchParams);
   return (
     <section>
       <CategoriesList category={searchParams.category} search={searchParams.search} />
@@ -21,4 +17,4 @@ function Page({ searchParams }: Props) {
     </section>
   );
 }
-export default Page;
+export default HomePage;
