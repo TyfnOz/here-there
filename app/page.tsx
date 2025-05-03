@@ -3,7 +3,14 @@ import CategoriesList from '@/components/home/CategoriesList';
 import PropertiesContainer from '@/components/home/PropertiesContainer';
 import { Suspense } from 'react';
 
-function Page({ searchParams }: { searchParams: { category?: string; search?: string } }) {
+type Props = {
+  searchParams: {
+    category?: string;
+    search?: string;
+  };
+};
+
+function Page({ searchParams }: Props) {
   return (
     <section>
       <CategoriesList category={searchParams.category} search={searchParams.search} />
