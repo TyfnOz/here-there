@@ -16,7 +16,10 @@ import { redirect } from 'next/navigation';
 import { type Amenity } from '@/utils/amenities';
 import ImageInputContainer from '@/components/form/ImageInputContainer';
 
-async function EditRentalPage({params}:{params:{id:string}}) {
+type Params = Promise<{ id: string }>
+
+async function EditRentalPage(props:{params:Params}) {
+  const params = await props.params;
   const property = await fetchRentalDetails(params.id);
   if(!property) redirect('/');
 
