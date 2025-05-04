@@ -5,9 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -28,6 +28,7 @@ model Profile {
   properties   Property[]
   favorites    Favorite[]
   reviews      Review[]
+  bookings     Booking[]
 }
 
 model Property {
@@ -46,6 +47,7 @@ model Property {
   amenities   String
   favorites   Favorite[]
   reviews     Review[]
+  bookings    Booking[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   profile     Profile    @relation(fields: [profileId], references: [clerkId], onDelete: Cascade)
@@ -57,21 +59,36 @@ model Favorite {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profile   Profile  @relation(fields: [profileId], references: [clerkId], onDelete: Cascade)
+  profile   Profile @relation(fields: [profileId], references: [clerkId], onDelete: Cascade)
   profileId String
 
-  property   Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId String
 }
 
 model Review {
-  id        String   @id @default(uuid())
-  profile   Profile  @relation(fields: [profileId], references: [clerkId], onDelete: Cascade)
-  profileId String
-  property   Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  profile    Profile  @relation(fields: [profileId], references: [clerkId], onDelete: Cascade)
+  profileId  String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId String
-  rating    Int
-  comment   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  rating     Int
+  comment    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Booking {
+  id            String   @id @default(uuid())
+  profile       Profile  @relation(fields: [profileId], references: [clerkId], onDelete: Cascade)
+  profileId     String
+  property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId    String
+  orderTotal    Int
+  totalNights   Int
+  checkIn       DateTime
+  checkOut      DateTime
+  paymentStatus Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

@@ -1,7 +1,6 @@
 import FavoriteToggleButton from "@/components/card/FavoriteToggleButton";
 import PropertyRating from "@/components/card/PropertyRating";
 import Amenities from "@/components/properties/Amenities";
-import BookingCalendar from "@/components/properties/BookingCalendar";
 import BreadCrumbs from "@/components/properties/BreadCrumbs";
 import Description from "@/components/properties/Description";
 import ImageContainer from "@/components/properties/ImageContainer";
@@ -15,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { fetchPropertyDetails, findExistingReview } from "@/utils/actions"
 import { redirect } from "next/navigation";
 import {auth} from '@clerk/nextjs/server';
+import BookingWrapperClient from "@/components/booking/BookingWrapperClient";
 
 type Params = Promise<{ id: string }>
 
@@ -31,8 +31,6 @@ async function PropertyDetailsPage(props:{params:Params}) {
   const isNotOwner = property.profile.clerkId !== userId;
   const reviewDoesNotExist = userId && isNotOwner 
         && !(await findExistingReview(userId,property.id));
-  
-
   return (
     <section>
         <BreadCrumbs name={property.name} />
@@ -58,8 +56,11 @@ async function PropertyDetailsPage(props:{params:Params}) {
                 <PropertyMapClient countryCode={property.country}/>
             </div>
             <div className="lg:col-span-4 flex flex-col items-center">
-                { /* calendar */}
-                <BookingCalendar />
+                <BookingWrapperClient 
+                    propertyId={property.id} 
+                    price={property.price} 
+                    bookings={property.bookings}
+                />
             </div>
         </section>
         {reviewDoesNotExist && <SubmitReview propertyId={property.id}/>}
