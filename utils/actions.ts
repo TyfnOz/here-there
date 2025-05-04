@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { uploadImage } from "./supabase";
 import { calculateTotals } from "./calculateTotals";
+import { formatDate } from "./format";
 
 const getAuthUser = async () => {
   const user = await currentUser();
@@ -14,6 +15,12 @@ const getAuthUser = async () => {
     throw new Error('You must be logged in to acces this route.');
   if (!user.privateMetadata.hasProfile)
     redirect('/profile/create');
+  return user;
+};
+
+const getAdminUser = async () => {
+  const user = await getAuthUser();
+  if (user.id !== process.env.ADMIN_USER_ID) redirect('/');
   return user;
 };
 
@@ -520,7 +527,7 @@ export const fetchRentalDetails = async (propertyId: string) => {
   });
 };
 
-export const updatePropertyAction = async (prevState:any, formData:FormData):Promise<{message:string}> => {
+export const updatePropertyAction = async (prevState: any, formData: FormData): Promise<{ message: string }> => {
   const user = await getAuthUser();
   const propertyId = formData.get('id') as string;
 
@@ -528,40 +535,40 @@ export const updatePropertyAction = async (prevState:any, formData:FormData):Pro
     const rawData = Object.fromEntries(formData);
     const validatedFields = validateWithZodSchema(propertySchema, rawData);
     await db.property.update({
-      where:{
-        id:propertyId,
-        profileId:user.id,
+      where: {
+        id: propertyId,
+        profileId: user.id,
       },
-      data:{
+      data: {
         ...validatedFields
       }
     });
     revalidatePath(`/rentals/${propertyId}/edit`);
-    return {message: 'Update Successful.'};
+    return { message: 'Update Successful.' };
   } catch (error) {
     return renderError(error);
   }
 };
 
-export const updatePropertyImageAction = async (prevState:any, formData:FormData):Promise<{message:string}> => {
+export const updatePropertyImageAction = async (prevState: any, formData: FormData): Promise<{ message: string }> => {
   const user = await getAuthUser();
   const propertyId = formData.get('id') as string;
 
   try {
     const image = formData.get('image') as File;
-    const validatedFields = validateWithZodSchema(imageSchema, {image});
+    const validatedFields = validateWithZodSchema(imageSchema, { image });
     const fullPath = await uploadImage(validatedFields.image);
     await db.property.update({
-      where:{
-        id:propertyId,
-        profileId:user.id,
+      where: {
+        id: propertyId,
+        profileId: user.id,
       },
-      data:{
+      data: {
         image: fullPath,
       }
     });
     revalidatePath(`/rentals/${propertyId}/edit`);
-    return { message: 'Property Image Updated Successfully.' };  
+    return { message: 'Property Image Updated Successfully.' };
   } catch (error) {
     return renderError(error);
   }
@@ -594,3 +601,49 @@ export const fetchReservations = async () => {
   });
   return reservations;
 };
+
+export const fetchStats = async () => {
+  await getAdminUser();
+
+  const usersCount = await db.profile.count();
+  const propertiesCount = await db.property.count();
+  const bookingsCount = await db.booking.count();
+
+  return {
+    usersCount,
+    propertiesCount,
+    bookingsCount,
+  };
+};
+
+export const fetchChartsData = async () => {
+  await getAdminUser();
+
+  const date = new Date();
+  date.setMonth(date.getMonth() - 6);
+  const sixMonthsAgo = date;
+
+  const bookings = await db.booking.findMany({
+    where:{
+      createdAt:{
+        gte:sixMonthsAgo
+      }
+    },
+    orderBy:{
+      createdAt:'asc',
+    }
+  });
+
+  const bookingsPerMonth = bookings.reduce((total, current) => {
+    const date = formatDate(current.createdAt, true);
+    const existingEntry = total.find((entry) => entry.date === date);
+    if(existingEntry){
+      existingEntry.count += 1;
+    }
+    else{
+      total.push({date, count: 1 });
+    }
+    return total;
+  }, [] as Array<{date:string, count:number}>);
+  return bookingsPerMonth;
+}
