@@ -12,12 +12,12 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
-    files: ['**/*.{ts,mts,cts,mjs}'],
-    "rules": {
-      "no-unused-vars": "warn", 
-      "@typescript/no-unused-vars": "warn"
+    rules: {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
-  }
+  },
 ];
+
 
 export default eslintConfig;
